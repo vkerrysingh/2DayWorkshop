@@ -1,13 +1,16 @@
 pragma solidity >=0.4.22 <0.6.0;
-contract SimpleCoin{
+import "github.com/OpenZeppelin/openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+contract SimpleCoin is Ownable{
 
     uint256 totalAmt;
-    address owner;
+    //address owner;
     mapping(address=>uint256) accountMap;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Failed(string);
 
+   /*
     modifier hasBalanceAmt(address _sourceAddress, uint256 _value){
         if (accountMap[msg.sender] >= _value) {
             _;
@@ -15,9 +18,9 @@ contract SimpleCoin{
         else
             emit Failed("Failed");
     }
+    */
 
     constructor() public {
-        owner=msg.sender;
         totalAmt=2000000;
         accountMap[msg.sender]=totalAmt;
     }
@@ -39,10 +42,18 @@ contract SimpleCoin{
         return "VS";
     }
 
+    function transfer(address _to, uint256 _value) public onlyOwner() returns (bool){
+        accountMap[msg.sender] -= _value;
+        accountMap[_to] += _value;
+        emit Transfer(msg.sender,_to,_value);
+    }
+
+    /*
     function transfer(address _to, uint256 _value) public hasBalanceAmt(msg.sender,_value) returns (bool){
         accountMap[msg.sender] -= _value;
         accountMap[_to] += _value;
         emit Transfer(msg.sender,_to,_value);
     }
+    */
 
 }
